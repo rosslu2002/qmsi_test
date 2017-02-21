@@ -1,0 +1,11 @@
+com.intel.core.platform.selected.id=com.intel.iss.mcu.platform.mount_atlas
+com.intel.core.project.name=Hello_World
+com.intel.core.project.type.id=com.intel.iss.mcu.nature.qmsi.v1_1_0.qmsiNature
+com.intel.core.project.version=3.0.0
+eclipse.preferences.version=1
+platform/build.toolchain_id=com.intel.iss.mcu.toolChain.gcc.a.debug
+platform/connection.configuration=-f scripts/board/quark_se_onboard.cfg
+platform/connection.port=3333
+platform/core.name=Quark
+platform/soc=quark_se
+platform/target=x86
