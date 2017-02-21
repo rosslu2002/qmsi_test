@@ -27,46 +27,53 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * QMSI blinky app example.
+#ifndef __QM_COMPARATOR_H__
+#define __QM_COMPARATOR_H__
+
+#include "qm_common.h"
+#include "qm_soc_regs.h"
+
+/**
+ * Analog Comparator.
  *
- * This app will blink a LED on the development platform indefinitely.
- *
- * In order for this application to work correctly on the Intel(R) Quark(TM)
- * Microcontroller D2000 Development Platform, jumper J3 must be set to USR.
+ * @defgroup groupAC Analog Comparator
+ * @{
  */
 
-#include "clk.h"
-#include "qm_gpio.h"
-#include "qm_pinmux.h"
+/**
+ * Analog Comparator configuration type.
+ *
+ * Each bit in the registers controls a single Analog Comparator pin.
+ */
+typedef struct {
+	uint32_t int_en;    /**< Interrupt enable. */
+	uint32_t reference; /**< Reference voltage, 1b: VREF; 0b: AR_PIN. */
+	uint32_t polarity;  /**< 0b: input>ref; 1b: input<ref */
+	uint32_t power;     /**< 1b: Normal mode; 0b:Power-down/Shutdown mode */
 
-/* The following defines the pin and pin mux details for each SoC. */
-#if (QUARK_SE)
-#define PIN_OUT 25
-#define LED_PIN_ID (QM_PIN_ID_59)
-#elif(QUARK_D2000)
-#define PIN_OUT 24
-#define LED_PIN_ID (QM_PIN_ID_24)
-#endif
-#define PIN_MUX_FN (QM_PMUX_FN_0)
-#define DELAY 250000UL /* 0.25 seconds. */
+	/**
+	 * Transfer callback.
+	 *
+	 * @param[in] data Callback user data.
+	 * @param[in] status Comparator interrupt status.
+	 */
+	void (*callback)(void *data, uint32_t int_status);
+	void *callback_data; /**< Callback user data. */
+} qm_ac_config_t;
 
-int main(void)
-{
-	static qm_gpio_port_config_t cfg;
+/**
+ * Set Analog Comparator configuration.
+ *
+ * @param[in] config Analog Comparator configuration. This must not be NULL.
+ *
+ * @return Standard errno return type for QMSI.
+ * @retval 0 on success.
+ * @retval Negative @ref errno for possible error codes.
+ */
+int qm_ac_set_config(const qm_ac_config_t *const config);
 
-	/* Set the GPIO pin muxing. */
-	qm_pmux_select(LED_PIN_ID, PIN_MUX_FN);
+/**
+ * @}
+ */
 
-	/* Set the GPIO pin direction to out and write the config. */
-	cfg.direction = BIT(PIN_OUT);
-	qm_gpio_set_config(QM_GPIO_0, &cfg);
-
-	/* Loop indefinitely while blinking the LED. */
-	while (1) {
-		qm_gpio_set_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-		qm_gpio_clear_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-	}
-}
+#endif /* __QM_COMPARATOR_H__ */

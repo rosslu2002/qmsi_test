@@ -27,46 +27,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * QMSI blinky app example.
+#ifndef __QM_VERSION_H__
+#define __QM_VERSION_H__
+
+#include "qm_common.h"
+#include "qm_soc_regs.h"
+
+/**
+ * Version number functions for API.
  *
- * This app will blink a LED on the development platform indefinitely.
- *
- * In order for this application to work correctly on the Intel(R) Quark(TM)
- * Microcontroller D2000 Development Platform, jumper J3 must be set to USR.
+ * @defgroup groupVersion Version
+ * @{
  */
 
-#include "clk.h"
-#include "qm_gpio.h"
-#include "qm_pinmux.h"
+/* Create a single version number from the major, minor and patch numbers. */
+#define QM_VER_API_UINT                                                        \
+	((QM_VER_API_MAJOR * 10000) + (QM_VER_API_MINOR * 100) +               \
+	 QM_VER_API_PATCH)
 
-/* The following defines the pin and pin mux details for each SoC. */
-#if (QUARK_SE)
-#define PIN_OUT 25
-#define LED_PIN_ID (QM_PIN_ID_59)
-#elif(QUARK_D2000)
-#define PIN_OUT 24
-#define LED_PIN_ID (QM_PIN_ID_24)
-#endif
-#define PIN_MUX_FN (QM_PMUX_FN_0)
-#define DELAY 250000UL /* 0.25 seconds. */
+/* Create a version number string from the major, minor and patch numbers. */
+#define QM_VER_API_STRING                                                      \
+	QM_VER_STRINGIFY(QM_VER_API_MAJOR, QM_VER_API_MINOR, QM_VER_API_PATCH)
 
-int main(void)
-{
-	static qm_gpio_port_config_t cfg;
+/**
+ * Get the ROM version number.
+ *
+ * Reads the ROM version information from flash and returns it.
+ *
+ * @return uint32_t ROM version.
+ */
+uint32_t qm_ver_rom(void);
 
-	/* Set the GPIO pin muxing. */
-	qm_pmux_select(LED_PIN_ID, PIN_MUX_FN);
+/**
+ * @}
+ */
 
-	/* Set the GPIO pin direction to out and write the config. */
-	cfg.direction = BIT(PIN_OUT);
-	qm_gpio_set_config(QM_GPIO_0, &cfg);
-
-	/* Loop indefinitely while blinking the LED. */
-	while (1) {
-		qm_gpio_set_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-		qm_gpio_clear_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-	}
-}
+#endif /* __QM_VERSION_H__ */

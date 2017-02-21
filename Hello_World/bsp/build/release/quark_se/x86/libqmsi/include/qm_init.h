@@ -27,46 +27,38 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * QMSI blinky app example.
+#ifndef __QM_INIT_H__
+#define __QM_INIT_H__
+
+#include "qm_common.h"
+#include "qm_soc_regs.h"
+
+/**
+ * Initialisation and reset.
  *
- * This app will blink a LED on the development platform indefinitely.
- *
- * In order for this application to work correctly on the Intel(R) Quark(TM)
- * Microcontroller D2000 Development Platform, jumper J3 must be set to USR.
+ * @defgroup groupInit Initialisation
+ * @{
  */
 
-#include "clk.h"
-#include "qm_gpio.h"
-#include "qm_pinmux.h"
+/**
+ * Reset Mode type.
+ */
+typedef enum {
+	QM_WARM_RESET = BIT(1), /**< Warm reset. */
+	QM_COLD_RESET = BIT(3), /**< Cold reset. */
+} qm_soc_reset_t;
 
-/* The following defines the pin and pin mux details for each SoC. */
-#if (QUARK_SE)
-#define PIN_OUT 25
-#define LED_PIN_ID (QM_PIN_ID_59)
-#elif(QUARK_D2000)
-#define PIN_OUT 24
-#define LED_PIN_ID (QM_PIN_ID_24)
-#endif
-#define PIN_MUX_FN (QM_PMUX_FN_0)
-#define DELAY 250000UL /* 0.25 seconds. */
+/**
+ * Reset the SoC.
+ *
+ * This can either be a cold reset or a warm reset.
+ *
+ * @param [in] reset_type Selects the type of reset to perform.
+ */
+void qm_soc_reset(qm_soc_reset_t reset_type);
 
-int main(void)
-{
-	static qm_gpio_port_config_t cfg;
+/**
+ * @}
+ */
 
-	/* Set the GPIO pin muxing. */
-	qm_pmux_select(LED_PIN_ID, PIN_MUX_FN);
-
-	/* Set the GPIO pin direction to out and write the config. */
-	cfg.direction = BIT(PIN_OUT);
-	qm_gpio_set_config(QM_GPIO_0, &cfg);
-
-	/* Loop indefinitely while blinking the LED. */
-	while (1) {
-		qm_gpio_set_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-		qm_gpio_clear_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-	}
-}
+#endif /* __QM_INIT_H__ */

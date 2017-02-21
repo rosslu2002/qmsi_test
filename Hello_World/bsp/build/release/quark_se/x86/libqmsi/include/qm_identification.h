@@ -27,46 +27,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * QMSI blinky app example.
+#ifndef __QM_IDENTIFICATION_H__
+#define __QM_IDENTIFICATION_H__
+
+#include "qm_common.h"
+#include "qm_soc_regs.h"
+
+/**
+ * Identification functions for Quark Microcontrollers.
  *
- * This app will blink a LED on the development platform indefinitely.
- *
- * In order for this application to work correctly on the Intel(R) Quark(TM)
- * Microcontroller D2000 Development Platform, jumper J3 must be set to USR.
+ * @defgroup groupIdentification Identification
+ * @{
  */
 
-#include "clk.h"
-#include "qm_gpio.h"
-#include "qm_pinmux.h"
+/**
+ * Get Quark SoC identification number
+ *
+ * @return uint32_t SoC identifier number.
+ */
+uint32_t qm_soc_id(void);
 
-/* The following defines the pin and pin mux details for each SoC. */
-#if (QUARK_SE)
-#define PIN_OUT 25
-#define LED_PIN_ID (QM_PIN_ID_59)
-#elif(QUARK_D2000)
-#define PIN_OUT 24
-#define LED_PIN_ID (QM_PIN_ID_24)
-#endif
-#define PIN_MUX_FN (QM_PMUX_FN_0)
-#define DELAY 250000UL /* 0.25 seconds. */
+/**
+ * Get Quark SoC version number
+ *
+ * @return uint32_t SoC version number.
+ */
+uint32_t qm_soc_version(void);
 
-int main(void)
-{
-	static qm_gpio_port_config_t cfg;
+/**
+ * @}
+ */
 
-	/* Set the GPIO pin muxing. */
-	qm_pmux_select(LED_PIN_ID, PIN_MUX_FN);
-
-	/* Set the GPIO pin direction to out and write the config. */
-	cfg.direction = BIT(PIN_OUT);
-	qm_gpio_set_config(QM_GPIO_0, &cfg);
-
-	/* Loop indefinitely while blinking the LED. */
-	while (1) {
-		qm_gpio_set_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-		qm_gpio_clear_pin(QM_GPIO_0, PIN_OUT);
-		clk_sys_udelay(DELAY);
-	}
-}
+#endif /* __QM_IDENTIFICATION_H__ */
